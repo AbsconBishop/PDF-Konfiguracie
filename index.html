@@ -251,6 +251,10 @@ const mname = c => (MARKET_NAMES[curLang] && MARKET_NAMES[curLang][c]) || c;
 
 const MB_LOC = /(\/CCci\/)([A-Z]{2})(\/)([a-z]{2,3})(\/)([a-z]{2,3})(_)([A-Z]{2})(__)/;
 const MB_DOM = /(www\.mercedes-benz\.)([a-z.]+?)(\/passengercars)/;
+const VAN_DOM = /(mercedes-benz\.)([a-z.]+?)(\/vans)/;
+const VAN_L1  = /(#\/)([a-z]{2})_([A-Z]{2})(\/stage\/)/;
+const VAN_L2  = /(\/stage\/)([a-z]{2})_([A-Z]{2})__(\d+)_([A-Z]{2})1__/;
+const isVan   = u => /van-online-configurator/.test(u) && VAN_L2.test(u);
 const PO_RE  = /(configurator\.porsche\.com\/)([a-z]{2})(-)([A-Z]{2})(\/)/;
 const BMW_RE = /(configure\.bmw\.[a-z.]+\/)([a-z]{2})(_)([A-Z]{2})(\/configure\/)/;
 const LR_RE  = /(landrover\.[a-z.]+\/lr\/)([a-z]{2})(_)([a-z]{2})(\/)/;
@@ -259,13 +263,31 @@ const BRANDS = {
   mercedes: {
     name: "Mercedes-Benz",
     placeholder: "https://www.mercedes-benz.se/passengercars/.../configuration/CCci/SE/sv/sv_SE__1673731__.../summary",
-    test: u => /mercedes-benz\./.test(u) && MB_LOC.test(u),
-    detect: u => { const x = u.match(MB_LOC); return x ? {country:x[2], lang:x[4]} : null; },
-    convert: (u,m) => u.replace(MB_DOM, `$1${m.tld}$3`)
-                       .replace(MB_LOC, `$1${m.country}$3${m.lang}$5${m.lang}$7${m.country}$9`),
-    highlight: safe => safe
+    test: u => /mercedes-benz\./.test(u) && (MB_LOC.test(u) || isVan(u)),
+    detect: u => {
+      if(isVan(u)){ const x = u.match(VAN_L2); return x ? {country:x[3], lang:x[2]} : null; }
+      const x = u.match(MB_LOC); return x ? {country:x[2], lang:x[4]} : null;
+    },
+    convert: (u,m) => {
+      if(isVan(u)){
+        return u.replace(VAN_DOM, `$1${m.tld}$3`)
+                .replace(VAN_L1, (x,a,l,c,d) => `${a}${m.lang}_${m.country}${d}`)
+                .replace(VAN_L2, (x,a,l,c,dig) => `${a}${m.lang}_${m.country}__${dig}_${m.country}1__`);
+      }
+      return u.replace(MB_DOM, `$1${m.tld}$3`)
+              .replace(MB_LOC, `$1${m.country}$3${m.lang}$5${m.lang}$7${m.country}$9`);
+    },
+    highlight: safe => {
+      if(/van-online-configurator/.test(safe)){
+        return safe
+          .replace(VAN_DOM, `$1<span class="hl">$2</span>$3`)
+          .replace(VAN_L1, `$1<span class="hl">$2_$3</span>$4`)
+          .replace(VAN_L2, `$1<span class="hl">$2_$3</span>__$4_<span class="hl">$5</span>1__`);
+      }
+      return safe
         .replace(MB_DOM, `$1<span class="hl">$2</span>$3`)
-        .replace(MB_LOC, `$1<span class="hl">$2</span>$3<span class="hl">$4</span>$5<span class="hl">$6$7$8</span>$9`),
+        .replace(MB_LOC, `$1<span class="hl">$2</span>$3<span class="hl">$4</span>$5<span class="hl">$6$7$8</span>$9`);
+    },
   },
   porsche: {
     name: "Porsche",
@@ -421,6 +443,15 @@ function brandOf(url){
 // returns array of {cat, code}
 function parseEquip(brandKey, url){
   if(brandKey === 'mercedes'){
+    if(/van-online-configurator/.test(url)){
+      const items = [];
+      const vm = url.match(/_[A-Z]{2}1__([^#]+)/);
+      if(vm){
+        vm[1].split(/[-_]/).filter(t => t && !['DUP0','D','2'].includes(t))
+             .forEach(c => items.push({cat:'·', code:c}));
+      }
+      return items;
+    }
     const after = (url.split(/_[A-Z]{2}__/)[1]) || '';
     const tail = after.replace(/\/summary.*$/,'').replace(/[#?].*$/,'');
     const parts = tail.split('__');
