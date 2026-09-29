@@ -110,6 +110,7 @@
     font-size:12px;color:var(--grey);margin-bottom:10px}
   .diffsub{font-size:11.5px;color:var(--grey);margin:10px 0 4px;font-family:'Archivo'}
   .diffrow{margin-bottom:4px}
+  .vanintro{font-size:12px;color:var(--grey);line-height:1.55;margin:0 auto 16px;max-width:600px;text-align:center}
 
   .lang{display:flex;justify-content:flex-end;gap:4px;margin-bottom:8px}
   .lang button{cursor:pointer;border:1px solid var(--line-strong);background:#fff;color:var(--grey);
@@ -139,6 +140,7 @@
   <div class="seg" id="mode">
     <button data-mode="convert" class="on">Konvertovať</button>
     <button data-mode="compare">Porovnať</button>
+    <button data-mode="van">Vany</button>
   </div>
 
   <div id="mode-convert">
@@ -191,6 +193,36 @@
     </div>
   </div>
 
+  <div id="mode-van" style="display:none">
+    <p class="vanintro" id="t-van-intro">Úžitkové vozidlá majú v každom trhu iný základ, takže prosté prehodenie linku nefunguje. Tento režim namiesto toho prenesie tvoje voľby na základ cieľového trhu. Treba 3 linky z van konfigurátora — všetky pre rovnaký model.</p>
+    <div class="card">
+      <div class="label"><span class="num">A</span> <span id="t-va">Konfigurovaný van (zdroj)</span></div>
+      <textarea id="va" spellcheck="false"></textarea>
+    </div>
+    <div class="card">
+      <div class="label"><span class="num">B</span> <span id="t-vb">Prázdny van — rovnaký model a trh ako A</span></div>
+      <textarea id="vb" spellcheck="false"></textarea>
+    </div>
+    <div class="card">
+      <div class="label"><span class="num">C</span> <span id="t-vc">Prázdny van — cieľový trh (rovnaký model)</span></div>
+      <textarea id="vc" spellcheck="false"></textarea>
+    </div>
+    <div class="card">
+      <div class="label"><span id="t-vanout">Prenesený link</span></div>
+      <div class="out-box empty" id="vanout">Vlož všetky tri linky…</div>
+      <div class="actions">
+        <button class="act primary" id="vcopy" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+          <span id="vcopyTxt">Kopírovať</span>
+        </button>
+        <button class="act" id="vopen" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 5h5v5"/><path d="M19 5 9 15"/><path d="M19 13v6H5V5h6"/></svg>
+          <span id="vopenTxt">Otvoriť</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <p class="note" id="t-note">
     <b>Poznámka:</b> Appka mení iba trh — kompletný konfiguračný reťazec (balíky, výbava, kódy) ostáva 1:1. Ak nejaký balík alebo výbava nie je dostupná na cieľovom trhu, konfigurátor ju môže pri otvorení sám vynechať alebo upraviť cenu. Vždy je dobré výsledok rýchlo skontrolovať v prehliadači.
   </p>
@@ -239,7 +271,7 @@ const MARKET_NAMES = {
 };
 
 const LANG = {
-  sk:{h1:"Konvertér krajiny konfigurácie",tag:"Vlož link z konfigurátora Mercedes-Benz, BMW, Porsche alebo Land Rover z ľubovoľného trhu. Appka rozpozná značku aj trh, ponechá celú konfiguráciu nedotknutú a prepíše iba lokalizačnú časť na zvolený cieľový trh.",mode_convert:"Konvertovať",mode_compare:"Porovnať",src:"Zdrojový link",wait:"Čakám na link…",target:"Cieľový trh",out:"Prepísaný link",out_empty:"Výsledok sa zobrazí tu.",copy:"Kopírovať",copied:"Skopírované ✓",open:"Otvoriť",invalid:"Toto nevyzerá ako Mercedes-Benz, BMW, Porsche ani Land Rover konfigurátor link.",already:"Link je už pre cieľový trh (%s).",da:"Pôvodný link",db:"Druhý link",da_ph:"napr. zahraničný link, alebo originál pred prepisom",db_ph:"napr. ten, ktorý ti vypľul cieľový konfigurátor",diff:"Rozdiel výbavy",diff_empty:"Vlož oba linky…",diff_invalid:"Aspoň jeden link nie je platný konfigurátor link.",diff_diffbrand:"Linky sú z rôznych značiek — porovnať sa dajú len rovnaké.",diff_identical:"Konfigurácia je identická — žiadny rozdiel vo výbave.",diff_added:"Pribudlo",diff_removed:"Ubudlo",diff_added_sub:"Pribudlo (je v B, nie v A):",diff_removed_sub:"Ubudlo (bolo v A, nie v B):",note:"<b>Poznámka:</b> Appka mení iba trh — kompletný konfiguračný reťazec (balíky, výbava, kódy) ostáva 1:1. Ak nejaký balík alebo výbava nie je dostupná na cieľovom trhu, konfigurátor ju môže pri otvorení sám vynechať alebo upraviť cenu. Vždy je dobré výsledok rýchlo skontrolovať v prehliadači."},
+  sk:{h1:"Konvertér krajiny konfigurácie",tag:"Vlož link z konfigurátora Mercedes-Benz, BMW, Porsche alebo Land Rover z ľubovoľného trhu. Appka rozpozná značku aj trh, ponechá celú konfiguráciu nedotknutú a prepíše iba lokalizačnú časť na zvolený cieľový trh.",mode_convert:"Konvertovať",mode_compare:"Porovnať",src:"Zdrojový link",wait:"Čakám na link…",target:"Cieľový trh",out:"Prepísaný link",out_empty:"Výsledok sa zobrazí tu.",copy:"Kopírovať",copied:"Skopírované ✓",open:"Otvoriť",invalid:"Toto nevyzerá ako Mercedes-Benz, BMW, Porsche ani Land Rover konfigurátor link.",already:"Link je už pre cieľový trh (%s).",da:"Pôvodný link",db:"Druhý link",da_ph:"napr. zahraničný link, alebo originál pred prepisom",db_ph:"napr. ten, ktorý ti vypľul cieľový konfigurátor",diff:"Rozdiel výbavy",diff_empty:"Vlož oba linky…",diff_invalid:"Aspoň jeden link nie je platný konfigurátor link.",diff_diffbrand:"Linky sú z rôznych značiek — porovnať sa dajú len rovnaké.",diff_identical:"Konfigurácia je identická — žiadny rozdiel vo výbave.",diff_added:"Pribudlo",diff_removed:"Ubudlo",diff_added_sub:"Pribudlo (je v B, nie v A):",diff_removed_sub:"Ubudlo (bolo v A, nie v B):",mode_van:"Vany",van_intro:"Úžitkové vozidlá majú v každom trhu iný základ, takže prosté prehodenie linku nefunguje. Tento režim namiesto toho prenesie tvoje voľby na základ cieľového trhu. Treba 3 linky z van konfigurátora — všetky pre rovnaký model.",van_a:"Konfigurovaný van (zdroj)",van_b:"Prázdny van — rovnaký model a trh ako A",van_c:"Prázdny van — cieľový trh (rovnaký model)",van_out:"Prenesený link",van_empty:"Vlož všetky tri linky…",van_err_notvan:"Všetky tri linky musia byť z van konfigurátora.",van_err_model:"Linky nie sú z rovnakého modelu (iný baumuster).",van_err_market:"Link A a B musia byť z rovnakého trhu.",van_added:"Prenesených volieb: %n",mode_van:"Vans",van_intro:"Vans have a different base in every market, so a plain link rewrite doesn't work. This mode instead transplants your selections onto the target market's base. You need 3 links from the van configurator — all for the same model.",van_a:"Configured van (source)",van_b:"Empty van — same model & market as A",van_c:"Empty van — target market (same model)",van_out:"Transplanted link",van_empty:"Paste all three links…",van_err_notvan:"All three links must be from the van configurator.",van_err_model:"The links are not the same model (different baumuster).",van_err_market:"Links A and B must be from the same market.",van_added:"Transplanted options: %n",mode_van:"Vans",van_intro:"Transporter haben in jedem Markt eine andere Basis, daher funktioniert ein einfaches Umschreiben des Links nicht. Dieser Modus überträgt stattdessen deine Auswahl auf die Basis des Zielmarkts. Du brauchst 3 Links aus dem Van-Konfigurator — alle für dasselbe Modell.",van_a:"Konfigurierter Van (Quelle)",van_b:"Leerer Van — gleiches Modell & gleicher Markt wie A",van_c:"Leerer Van — Zielmarkt (gleiches Modell)",van_out:"Übertragener Link",van_empty:"Alle drei Links einfügen…",van_err_notvan:"Alle drei Links müssen aus dem Van-Konfigurator stammen.",van_err_model:"Die Links sind nicht dasselbe Modell (anderes Baumuster).",van_err_market:"Links A und B müssen aus demselben Markt stammen.",van_added:"Übertragene Optionen: %n",mode_van:"Фургоны",van_intro:"У фургонов в каждом рынке своя база, поэтому простая замена ссылки не работает. Этот режим переносит твой выбор на базу целевого рынка. Нужны 3 ссылки из конфигуратора фургонов — все для одной модели.",van_a:"Сконфигурированный фургон (источник)",van_b:"Пустой фургон — та же модель и рынок, что A",van_c:"Пустой фургон — целевой рынок (та же модель)",van_out:"Перенесённая ссылка",van_empty:"Вставь все три ссылки…",van_err_notvan:"Все три ссылки должны быть из конфигуратора фургонов.",van_err_model:"Ссылки не одной модели (разный baumuster).",van_err_market:"Ссылки A и B должны быть с одного рынка.",van_added:"Перенесено опций: %n",note:"<b>Poznámka:</b> Appka mení iba trh — kompletný konfiguračný reťazec (balíky, výbava, kódy) ostáva 1:1. Ak nejaký balík alebo výbava nie je dostupná na cieľovom trhu, konfigurátor ju môže pri otvorení sám vynechať alebo upraviť cenu. Vždy je dobré výsledok rýchlo skontrolovať v prehliadači."},
   en:{h1:"Configuration country converter",tag:"Paste a Mercedes-Benz, BMW, Porsche or Land Rover configurator link from any market. The app detects the brand and market, keeps the whole configuration untouched and rewrites only the locale part to the chosen target market.",mode_convert:"Convert",mode_compare:"Compare",src:"Source link",wait:"Waiting for a link…",target:"Target market",out:"Rewritten link",out_empty:"The result will appear here.",copy:"Copy",copied:"Copied ✓",open:"Open",invalid:"This doesn't look like a Mercedes-Benz, BMW, Porsche or Land Rover configurator link.",already:"The link is already for the target market (%s).",da:"Original link",db:"Second link",da_ph:"e.g. a foreign link, or the original before rewriting",db_ph:"e.g. the link the target configurator produced",diff:"Equipment difference",diff_empty:"Paste both links…",diff_invalid:"At least one link is not a valid configurator link.",diff_diffbrand:"The links are from different brands — only the same brand can be compared.",diff_identical:"The configuration is identical — no difference in equipment.",diff_added:"Added",diff_removed:"Removed",diff_added_sub:"Added (in B, not in A):",diff_removed_sub:"Removed (was in A, not in B):",note:"<b>Note:</b> The app changes only the market — the full configuration string (packages, equipment, codes) stays 1:1. If a package or option isn't available in the target market, the configurator may silently drop it or adjust the price on opening. It's always good to quickly check the result in the browser."},
   de:{h1:"Konfigurations-Länderkonverter",tag:"Füge einen Konfigurator-Link von Mercedes-Benz, BMW, Porsche oder Land Rover aus einem beliebigen Markt ein. Die App erkennt Marke und Markt, lässt die gesamte Konfiguration unberührt und ändert nur den Sprach-/Länderteil auf den gewählten Zielmarkt.",mode_convert:"Konvertieren",mode_compare:"Vergleichen",src:"Quell-Link",wait:"Warte auf einen Link…",target:"Zielmarkt",out:"Umgeschriebener Link",out_empty:"Das Ergebnis erscheint hier.",copy:"Kopieren",copied:"Kopiert ✓",open:"Öffnen",invalid:"Das sieht nicht nach einem Mercedes-Benz-, BMW-, Porsche- oder Land-Rover-Konfigurator-Link aus.",already:"Der Link ist bereits für den Zielmarkt (%s).",da:"Originaler Link",db:"Zweiter Link",da_ph:"z. B. ein ausländischer Link oder das Original vor der Umschreibung",db_ph:"z. B. der vom Zielkonfigurator erzeugte Link",diff:"Ausstattungsunterschied",diff_empty:"Beide Links einfügen…",diff_invalid:"Mindestens ein Link ist kein gültiger Konfigurator-Link.",diff_diffbrand:"Die Links stammen von verschiedenen Marken — nur dieselbe Marke kann verglichen werden.",diff_identical:"Die Konfiguration ist identisch — kein Unterschied in der Ausstattung.",diff_added:"Hinzugefügt",diff_removed:"Entfernt",diff_added_sub:"Hinzugefügt (in B, nicht in A):",diff_removed_sub:"Entfernt (war in A, nicht in B):",note:"<b>Hinweis:</b> Die App ändert nur den Markt — die vollständige Konfigurationszeichenfolge (Pakete, Ausstattung, Codes) bleibt 1:1. Wenn ein Paket oder eine Option im Zielmarkt nicht verfügbar ist, kann der Konfigurator sie beim Öffnen stillschweigend entfernen oder den Preis anpassen. Es ist immer gut, das Ergebnis im Browser kurz zu prüfen."},
   ru:{h1:"Конвертер страны конфигурации",tag:"Вставь ссылку из конфигуратора Mercedes-Benz, BMW, Porsche или Land Rover с любого рынка. Приложение определит марку и рынок, оставит всю конфигурацию без изменений и заменит только языковую часть на выбранный целевой рынок.",mode_convert:"Конвертировать",mode_compare:"Сравнить",src:"Исходная ссылка",wait:"Ожидание ссылки…",target:"Целевой рынок",out:"Переписанная ссылка",out_empty:"Результат появится здесь.",copy:"Копировать",copied:"Скопировано ✓",open:"Открыть",invalid:"Это не похоже на ссылку конфигуратора Mercedes-Benz, BMW, Porsche или Land Rover.",already:"Ссылка уже для целевого рынка (%s).",da:"Исходная ссылка",db:"Вторая ссылка",da_ph:"напр. зарубежная ссылка или оригинал до замены",db_ph:"напр. та, которую выдал целевой конфигуратор",diff:"Разница в комплектации",diff_empty:"Вставь обе ссылки…",diff_invalid:"Хотя бы одна ссылка не является действительной ссылкой конфигуратора.",diff_diffbrand:"Ссылки разных марок — сравнивать можно только одинаковые.",diff_identical:"Конфигурация идентична — нет различий в комплектации.",diff_added:"Добавлено",diff_removed:"Убрано",diff_added_sub:"Добавлено (есть в B, нет в A):",diff_removed_sub:"Убрано (было в A, нет в B):",note:"<b>Примечание:</b> Приложение меняет только рынок — вся строка конфигурации (пакеты, опции, коды) остаётся 1:1. Если пакет или опция недоступны на целевом рынке, конфигуратор может молча удалить её или изменить цену при открытии. Всегда полезно быстро проверить результат в браузере."},
@@ -251,43 +283,21 @@ const mname = c => (MARKET_NAMES[curLang] && MARKET_NAMES[curLang][c]) || c;
 
 const MB_LOC = /(\/CCci\/)([A-Z]{2})(\/)([a-z]{2,3})(\/)([a-z]{2,3})(_)([A-Z]{2})(__)/;
 const MB_DOM = /(www\.mercedes-benz\.)([a-z.]+?)(\/passengercars)/;
-const VAN_DOM = /(mercedes-benz\.)([a-z.]+?)(\/vans)/;
-const VAN_L1  = /(#\/)([a-z]{2})_([A-Z]{2})(\/stage\/)/;
-const VAN_L2  = /(\/stage\/)([a-z]{2})_([A-Z]{2})__(\d+)_([A-Z]{2})1__/;
-const isVan   = u => /van-online-configurator/.test(u) && VAN_L2.test(u);
 const PO_RE  = /(configurator\.porsche\.com\/)([a-z]{2})(-)([A-Z]{2})(\/)/;
 const BMW_RE = /(configure\.bmw\.[a-z.]+\/)([a-z]{2})(_)([A-Z]{2})(\/configure\/)/;
-const LR_RE  = /(landrover\.[a-z.]+\/lr\/)([a-z]{2})(_)([a-z]{2})(\/)/;
+const LR_RE  = /((?:landrover|rangerover)\.[a-z.]+\/lr\/)([a-z]{2})(_)([a-z]{2})(\/)/;
 
 const BRANDS = {
   mercedes: {
     name: "Mercedes-Benz",
     placeholder: "https://www.mercedes-benz.se/passengercars/.../configuration/CCci/SE/sv/sv_SE__1673731__.../summary",
-    test: u => /mercedes-benz\./.test(u) && (MB_LOC.test(u) || isVan(u)),
-    detect: u => {
-      if(isVan(u)){ const x = u.match(VAN_L2); return x ? {country:x[3], lang:x[2]} : null; }
-      const x = u.match(MB_LOC); return x ? {country:x[2], lang:x[4]} : null;
-    },
-    convert: (u,m) => {
-      if(isVan(u)){
-        return u.replace(VAN_DOM, `$1${m.tld}$3`)
-                .replace(VAN_L1, (x,a,l,c,d) => `${a}${m.lang}_${m.country}${d}`)
-                .replace(VAN_L2, (x,a,l,c,dig) => `${a}${m.lang}_${m.country}__${dig}_${m.country}1__`);
-      }
-      return u.replace(MB_DOM, `$1${m.tld}$3`)
-              .replace(MB_LOC, `$1${m.country}$3${m.lang}$5${m.lang}$7${m.country}$9`);
-    },
-    highlight: safe => {
-      if(/van-online-configurator/.test(safe)){
-        return safe
-          .replace(VAN_DOM, `$1<span class="hl">$2</span>$3`)
-          .replace(VAN_L1, `$1<span class="hl">$2_$3</span>$4`)
-          .replace(VAN_L2, `$1<span class="hl">$2_$3</span>__$4_<span class="hl">$5</span>1__`);
-      }
-      return safe
+    test: u => /mercedes-benz\./.test(u) && MB_LOC.test(u),
+    detect: u => { const x = u.match(MB_LOC); return x ? {country:x[2], lang:x[4]} : null; },
+    convert: (u,m) => u.replace(MB_DOM, `$1${m.tld}$3`)
+                       .replace(MB_LOC, `$1${m.country}$3${m.lang}$5${m.lang}$7${m.country}$9`),
+    highlight: safe => safe
         .replace(MB_DOM, `$1<span class="hl">$2</span>$3`)
-        .replace(MB_LOC, `$1<span class="hl">$2</span>$3<span class="hl">$4</span>$5<span class="hl">$6$7$8</span>$9`);
-    },
+        .replace(MB_LOC, `$1<span class="hl">$2</span>$3<span class="hl">$4</span>$5<span class="hl">$6$7$8</span>$9`),
   },
   porsche: {
     name: "Porsche",
@@ -421,13 +431,14 @@ srcEl.addEventListener('input', run);
 run();
 
 // ---------- MODE SWITCH ----------
-const modeSeg = $('mode'), convPane = $('mode-convert'), compPane = $('mode-compare');
+const modeSeg = $('mode'), convPane = $('mode-convert'), compPane = $('mode-compare'), vanPane = $('mode-van');
 modeSeg.querySelectorAll('button').forEach(b => {
   b.onclick = () => {
+    const mode = b.dataset.mode;
     modeSeg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x===b));
-    const compare = b.dataset.mode === 'compare';
-    compPane.style.display = compare ? 'block' : 'none';
-    convPane.style.display = compare ? 'none' : 'block';
+    convPane.style.display = mode==='convert' ? 'block' : 'none';
+    compPane.style.display = mode==='compare' ? 'block' : 'none';
+    vanPane.style.display  = mode==='van' ? 'block' : 'none';
   };
 });
 
@@ -443,15 +454,6 @@ function brandOf(url){
 // returns array of {cat, code}
 function parseEquip(brandKey, url){
   if(brandKey === 'mercedes'){
-    if(/van-online-configurator/.test(url)){
-      const items = [];
-      const vm = url.match(/_[A-Z]{2}1__([^#]+)/);
-      if(vm){
-        vm[1].split(/[-_]/).filter(t => t && !['DUP0','D','2'].includes(t))
-             .forEach(c => items.push({cat:'·', code:c}));
-      }
-      return items;
-    }
     const after = (url.split(/_[A-Z]{2}__/)[1]) || '';
     const tail = after.replace(/\/summary.*$/,'').replace(/[#?].*$/,'');
     const parts = tail.split('__');
@@ -533,6 +535,53 @@ function runDiff(){
 daEl.addEventListener('input', runDiff);
 dbEl.addEventListener('input', runDiff);
 
+// ---------- VAN TRANSPLANT ----------
+const vaEl=$('va'), vbEl=$('vb'), vcEl=$('vc'), voutEl=$('vanout'),
+      vcopyBtn=$('vcopy'), vopenBtn=$('vopen');
+let vanResult = "";
+
+function vanParts(url){
+  const m = url.match(/^(.*?_([A-Z]{2})1__)(.*?)(_\d+-\d+_D-DUP\d+.*)$/);
+  if(!m) return null;
+  const bm = url.match(/_(\d+)_[A-Z]{2}1__/);
+  return {prefix:m[1], country:m[2], codes:m[3].split('-').filter(Boolean), trailer:m[4], baumuster: bm ? bm[1] : null};
+}
+function setVanErr(msg){
+  voutEl.className='out-box empty';
+  voutEl.innerHTML='<span style="color:var(--err)">'+msg+'</span>';
+  vcopyBtn.disabled=true; vopenBtn.disabled=true; vanResult='';
+}
+function runVan(){
+  const a=vaEl.value.trim(), b=vbEl.value.trim(), c=vcEl.value.trim();
+  if(!a||!b||!c){ voutEl.className='out-box empty'; voutEl.textContent=L.van_empty; vcopyBtn.disabled=true; vopenBtn.disabled=true; vanResult=''; return; }
+  const isVan=u=>/van-online-configurator/.test(u);
+  if(!isVan(a)||!isVan(b)||!isVan(c)){ setVanErr(L.van_err_notvan); return; }
+  const A=vanParts(a), B=vanParts(b), C=vanParts(c);
+  if(!A||!B||!C){ setVanErr(L.van_err_notvan); return; }
+  if(!(A.baumuster===B.baumuster && B.baumuster===C.baumuster)){ setVanErr(L.van_err_model); return; }
+  if(A.country!==B.country){ setVanErr(L.van_err_market); return; }
+  const setB=new Set(B.codes);
+  const added=A.codes.filter(x=>!setB.has(x));   // customer selections beyond source base
+  const res=new Set(C.codes);
+  added.forEach(x=>res.add(x));
+  const resultCodes=[...res].sort();
+  vanResult = C.prefix + resultCodes.join('-') + C.trailer;
+  const safe=vanResult.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  voutEl.className='out-box';
+  voutEl.innerHTML = `<div class="diffsub">${L.van_added.replace('%n', added.length)}</div>` + safe;
+  vcopyBtn.disabled=false; vopenBtn.disabled=false;
+}
+vaEl.addEventListener('input', runVan);
+vbEl.addEventListener('input', runVan);
+vcEl.addEventListener('input', runVan);
+vcopyBtn.onclick = async () => {
+  if(!vanResult) return;
+  try{ await navigator.clipboard.writeText(vanResult); }
+  catch(e){ const t=document.createElement('textarea'); t.value=vanResult; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+  const s=$('vcopyTxt'); s.textContent=L.copied; setTimeout(()=>s.textContent=L.copy,1400);
+};
+vopenBtn.onclick = () => { if(vanResult) window.open(vanResult,'_blank'); };
+
 // ---------- LANGUAGE ----------
 const langSeg = $('lang');
 function applyLang(code){
@@ -544,6 +593,15 @@ function applyLang(code){
   $('t-tag').textContent = L.tag;
   modeSeg.querySelector('[data-mode="convert"]').textContent = L.mode_convert;
   modeSeg.querySelector('[data-mode="compare"]').textContent = L.mode_compare;
+  modeSeg.querySelector('[data-mode="van"]').textContent = L.mode_van;
+  $('t-van-intro').textContent = L.van_intro;
+  $('t-va').textContent = L.van_a;
+  $('t-vb').textContent = L.van_b;
+  $('t-vc').textContent = L.van_c;
+  $('t-vanout').textContent = L.van_out;
+  $('vcopyTxt').textContent = L.copy;
+  $('vopenTxt').textContent = L.open;
+  if(voutEl.classList.contains('empty')) voutEl.textContent = L.van_empty;
   $('t-src').textContent = L.src;
   $('t-target').textContent = L.target;
   $('t-out').textContent = L.out;
@@ -563,6 +621,7 @@ function applyLang(code){
   if(diffEl.classList.contains('empty')) diffEl.textContent = L.diff_empty;
   run();
   runDiff();
+  runVan();
 }
 langSeg.querySelectorAll('button').forEach(b => {
   b.onclick = () => applyLang(b.dataset.l);
